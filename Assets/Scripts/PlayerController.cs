@@ -15,4 +15,14 @@ public class PlayerController : MonoBehaviour {
 		float v = Input.GetAxis ("Vertical");
 		rb2d.AddForce (new Vector2 (h, v));
 	}
+
+	void OnTriggerEnter2D(Collider2D other) {
+		Debug.Log (other.gameObject.tag);
+		if (other.gameObject.CompareTag("Pickups"))	{
+			other.GetComponent<PickupController>().GetManager().ReloadMaze ();
+			Destroy (other.gameObject);
+
+		}
+	}
+
 }

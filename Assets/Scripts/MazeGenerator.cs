@@ -18,24 +18,31 @@ namespace Completed
 		private int[] DY = { -1, 1, 0, 0 };
 
 		private int[,] grid;
+		private List<int[]> deadEnds;
 
 
 
-		void CarveMaze( int x, int y, int[,] g) {
+		void CarveMaze( int x, int y, int[,] g, List<int[]> ends) {
 			int[] order = newOrder(DIRECTIONS);
 
 			for (int i = 0; i < order.Length; i++) {
 				int newx = x + DX [order[i]];
 				int newy = y + DY [order[i]];
 				//Debug.Log ("Carving!");
-				if ((newy >= 0 && newy < rows) && (newx >= 0 && newx < columns) && g [newx, newy] == 0) {
+				if ((newy >= 0 && newy < columns) && (newx >= 0 && newx < rows) && g [newx, newy] == 0) {
 					g [x, y] |= DIRECTIONS [order [i]];
 					//Debug.Log ("x: " + x + ", y: " + y);
 					g [newx, newy] |= OPPOSITE_DIRECTIONS [order [i]];
-					CarveMaze (newx, newy, g);
+					CarveMaze (newx, newy, g, ends);
 				}
+
+			}
+			if ((g[x,y] & g[x,y]-1) == 0) {
+				int[] end = {x,y};
+				ends.Add (end);
 			}
 		}
+			
 
 		int[] newOrder(int[] s) {
 			int[] a = new int[s.Length];
@@ -62,9 +69,14 @@ namespace Completed
 			return grid;
 		}
 
-		public void CreateMaze(){
+		public List<int[]> GetDeadEnds() {
+			return deadEnds;
+		}
+
+		public void CreateMaze(int x, int y){
 			grid = new int[rows, columns];
-			CarveMaze(0, 0, grid);
+			deadEnds = new List<int[]> ();
+			CarveMaze(x, y, grid, deadEnds);
 			string g = "";
 			//Debug.Log ("gL 0 " + grid.GetLength (0));
 			//Debug.Log ("gL 1 " + grid.GetLength (1));
